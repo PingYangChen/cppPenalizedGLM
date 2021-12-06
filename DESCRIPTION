@@ -2,10 +2,20 @@ Package: cppPenalizedGLM
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Authors@R: person("Ping-Yang", "Chen", , "pychen.ping@gmail.com", c("aut", "cre"))
+Author: Ping-Yang Chen [aut, cre]
+Maintainer: Ping-Yang Chen <pychen.ping@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: MIT
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.2.3)
+Imports:
+    utils,
+    numDeriv,
+    glmnet,
+    Rcpp (>= 0.12.0),
+    RcppArmadillo,
+    RcppParallel
