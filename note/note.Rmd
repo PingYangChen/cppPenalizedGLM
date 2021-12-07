@@ -1,0 +1,21 @@
+---
+title: "Mathematical Details of Generalized Linear Model with Elastic Net Penalty"
+author: "Ping-Yang Chen"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Continuous Response
+
+Let $(\mathbf{y}, \mathbf{X})$ be the data of $n$ observations, where $\mathbf{y}\in\mathbb{R}^n$ is the vector of the response variable and $\mathbf{X}\in\mathbb{R}^{n\times p}$ is the matrix of $p$ covariates. 
+
+\begin{equtaion}
+
+\end{equation}
+
+
+
+
