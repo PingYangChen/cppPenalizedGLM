@@ -1,7 +1,24 @@
 #'
+confusion <- function(truth, pred) {
+  ulv <- unique(truth)
+  nlvls <- length(ulv)
+  cm <- matrix(0, nlvls, nlvls)
+  for (i in 1:nlvls) {
+    loc <- which(truth == ulv[i])
+    subpred <- pred[loc]
+    for (j in 1:nlvls) {
+      cm[i,j] <- sum(subpred == ulv[j])
+    }
+  }
+  dimnames(cm) <- list(ulv, ulv)
+  return(cm)
+}
+
+
 #'
 #'
 calcMaxLambda <- function(family, x, y, alpha) {
+  n <- nrow(x)
   if (family == "gaussian") {
     lambdaMax <- max(t(x) %*% y)/(n*alpha)
   } else if (family == "binomial") {
@@ -43,7 +60,7 @@ gaussian_elastic <- function(
       b0Vec[lm] <- b0
       bMat[,lm] <- b
       # Check stopping criterion
-      print(c(lm, m, i, dval))
+      #print(c(lm, m, i, dval))
       if (dval < tol) { break }
     }
   }
@@ -84,7 +101,7 @@ binomial_elastic <- function(
       b0Vec[lm] <- b0
       bMat[,lm] <- b
       # Check stopping criterion
-      print(c(lm, m, i, dval))
+      #print(c(lm, m, i, dval))
       if (dval < tol) { break }
     }
   }
@@ -127,8 +144,7 @@ multinomial_elastic <- function(
         # Update coefficients
         b0Array[,lm] <- b0
         bArray[,,lm] <- b
-        # Check stopping criterion
-        print(c(lm, m, i, dval))
+        # Check stopping criterion #print(c(lm, m, i, dval))
         if (dval < tol) { break }
       }
     }
@@ -159,22 +175,30 @@ calcWZ <- function(y, x, b0, b) {
 
 #'
 gaussian_predict <- function(object, x) {
-
+  pred <- matrix(object$b0, nrow(x), ncol(object$b), byrow = TRUE) + x %*% object$b
+  return(pred)
 }
 
 #'
 binomial_predict <- function(object, x) {
-  eta <- b0 + x %*% b
+  eta <- matrix(object$b0, nrow(x), ncol(object$b), byrow = TRUE) + x %*% object$b
   yp <- exp(eta)/(1 + exp(eta))
-  as.integer(yp > 0.5)
+  return((yp > 0.5) + 1 - 1)
 }
 
 #'
+
 multinomial_predict <- function(object, x) {
-  eta <- b0 + x %*% b
-  yp <- exp(eta)/matrix(rowSums(exp(eta)), n, 3)
-  yd <- yp/matrix(sapply(1:n, function(i) max(yp[i,])), n, 3)
-  yd*(yd == 1) - y
+
+  yp <- array(0, c(nrow(x), dim(object$b)[2], dim(object$b)[3]))
+  for (l in 1:dim(object$b)[3]) {
+    eta <- object$b0[,l] + x %*% object$b[,,l]
+    prob <- exp(eta)/matrix(rowSums(exp(eta)), nrow(x), ncol(eta))
+    decision <- matrix(0, nrow(x), ncol(prob))
+    decision[cbind(1:nrow(x), max.col(prob))] <- 1
+    yp[,,l] <- decision
+  }
+  return(yp)
 }
 
 shooting <- function(z, r) {
